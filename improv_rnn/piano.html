@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<title>Project Mugen | Piano</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark light">
+<link rel="icon" href="src/icon.svg" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inconsolata">
+<link href='css/piano.css' rel='stylesheet'>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-dark-5@1.1.3/dist/css/bootstrap-nightshade.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+  integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+<!-- Prereq libraries -->
+<script src="js/prereqs/audiokeys.js"></script>
+<script src="js/prereqs/Tone.js"></script>
+<script src="js/prereqs/lodash.js"></script>
+<script src="js/prereqs/StartAudioContext.js"></script>
+<script src="js/prereqs/events.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tensorflow/1.2.8/tf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@magenta/music@^1.0.0/es6/core.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@magenta/music@^1.0.0/es6/music_rnn.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tonaljs/tonal/browser/tonal.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/webmidi@next/dist/iife/webmidi.iife.js"></script>
+
+
+
+<!-- Main Scripts -->
+<script src="js/sound/sound.js" defer></script>
+<script src="js/slider/slider.js" defer></script>
+<script src='js/ai/ai.js' defer></script>
+<script src="js/keyboard/keyboard.js" defer></script>
+<script src="js/app.js" defer></script>
+<script src="js/settings/settings.js" defer></script>
+
+<body>
+  <div class="bg_height navbar-light ">
+    <header>
+      <nav class="navbar navbar-expand-sm navbar-light px-3" id="nav" style="z-index: 999;">
+        <div class="container-fluid p-0 py-2">
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+              <li class="nav-item">
+                <a class="nav-link active " href="../index.html">Home</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="about.html">How it Works</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link active" href="#">Piano</a>
+              </li>
+            </ul>
+          </div>
+          <div class="form-check form-switch me-5">
+            <input class="form-check-input" type="checkbox" id="darkmode">
+            <label class="form-check-label" for="darkmode">Dark Mode</label>
+          </div>
+          <button class="btn btn-dark" type="button" data-bs-toggle="offcanvas" data-bs-target="#options">Help &
+            Settings</button>
+        </div>
+      </nav>
+
+    </header>
+  </div>
+  <div class="text-center mt-5">
+    <h1 class="display-3">Music Pattern Generation using Improv RNN</h1>
+    <p class="text-muted" id="help-text">To begin, press the keys on the Piano. When you hold down the keys, the AI will
+      continue your melody.</p>
+    <h3 class="text-muted" id="desc"><span style="color: red">Red Keys</span> represents the keys you pressed.<span style="color: blue">Blue Keys</span> represents the Chords AI Generated.</h3>
+  </div>
+  <div class="container">
+
+    <div class="keyboard " id="keyboard"></div>
+  </div>
+  <div class="loading">
+    <div class="spinner-border text-primary" role="status"></div>
+    <p>Loading...</p> <!-- Spinner shown when piano is loading -->
+  </div>
+
+  <aside class="offcanvas offcanvas-start show" tabindex="-1" id="options" aria-labelledby="options"
+    style="z-index: 9999;">
+    <!-- z-index set to ensure modal background renders correctly-->
+    <div class="offcanvas-header">
+      <h4 class="offcanvas-title">🎹 Music Generation using Improv RNN</h5>
+        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+      <p class="lead">To begin, simply press the keys on the Piano. When you start playing,
+        simply hold
+        down the keys, and the model will automatically continue your melody!</p>
+      <div class="accordion accordion-flush" id="offcanvas-accordion">
+        <div class="accordion-item">
+          <h5 class="accordion-header"> <button class="accordion-button" type="button" data-bs-toggle="collapse"
+              data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+              ⌨ Controls
+            </button>
+          </h5>
+          <div class="accordion-collapse collapse show" id="collapseOne" data-bs-parent="#offcanvas-accordion">
+            <div class="accordion-body">
+              There are three primary ways to play this piano:
+              <ol class="list-group-numbered list-group-flush p-0 py-2">
+                <li class="list-group-item">Mouse/Touch: Simply use your mouse or finger to press the keys you want to
+                  play</li>
+                <li class="list-group-item">Computer Keyboard: The first two rows of your keyboard correspond to the
+                  keys on the Piano</li>
+                <li class="list-group-item">MIDI Input: A Piano with a MIDI connection can be used if it is connected to
+                  the device</li>
+              </ol>
+            </div>
+          </div>
+        </div>
+        <div class="accordion-item">
+          <h5 class="accordion-header"> <button class="accordion-button collapsed" type="button"
+              data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+              ⚙ Settings
+            </button>
+          </h5>
+          <div class="accordion-collapse collapse" id="collapseTwo" data-bs-parent="#offcanvas-accordion">
+            <div class="accordion-body">
+              <form id="settings">
+                <div class="mb-3">
+                  <label for="temperature" class="form-label">🌡 Temperature</label>
+                  <a tabindex="0" href="#" class="text-info text-decoration-none" role="button"
+                    data-bs-trigger="focus hover" data-bs-toggle="popover" title="🌡 Temperature"
+                    data-bs-container="form div"
+                    data-bs-content="Temperature controls the unpredictability of the AI player. A higher temperature means that the AI will generate more creative outputs, at the cost of some consistency of the output.">ℹ
+                  </a>
+                  <input type="range" class="form-range" id="temperature" min="0" max="2" value="1" step="0.05">
+                </div>
+                <div class="mb-3">
+                  <label for="steps" class="form-label">👣 AI Output Steps</label>
+                  <a tabindex="0" href="#" class="text-info text-decoration-none" role="button"
+                    data-bs-trigger="focus hover" data-bs-toggle="popover" title="👣 AI Output Steps"
+                    data-bs-container="form div"
+                    data-bs-content="The number of output steps determines the maximum amount of steps the AI will continue your initial melody for. As the number of steps increases, the output of the model may become more inconsistent as the model starts to 'forget' about what it has played thus far.">ℹ
+                  </a>
+                  <input type="range" class="form-range" id="steps" min="1" max="100" value="20" step="1">
+                </div>
+                <div class="mb-3">
+                  <label for="start_time" class="form-label">⏲ Start AI Generation Delay</label>
+                  <a tabindex="0" href="#" class="text-info text-decoration-none" role="button"
+                    data-bs-trigger="focus hover" data-bs-toggle="popover" title="⏲ Start AI Generation Delay"
+                    data-bs-container="form div"
+                    data-bs-content="This setting determines how long one has to hold down the keys before the AI begins to generate its output. If you feel the AI is taking too long to activate, reduce this setting. If you find yourself unable to play before getting interupted by the AI, increase this setting.">ℹ
+                  </a>
+                  <input type="range" class="form-range" id="start_time" min="0.1" max="20" value="0.5" step="0.1">
+                </div>
+                <div class="mb-3 form-check ps-0">
+                  <input id="show_bindings" type="checkbox" class="form-checkinput" value="" checked>
+                  <label for="show_bindings" class="form-check-label">Show Key Bindings</label>
+                </div>
+                <div class="mb-3 form-check ps-0">
+                  <input id="show_note" type="checkbox" class="form-checkinput" value="">
+                  <label for="show_note" class="form-check-label">Show Note Names</label>
+                </div>
+                <!-- TODO: Add other options: Themes, Time Til AI Starts Playing, Soundfonts Used etc. -->
+                <div class="mb-3">
+                  <button type="reset" class="btn btn-warning">Reset Settings</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+
+
+      </div>
+    </div>
+  </aside>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap-dark-5@1.1.3/dist/js/darkmode.min.js"></script>
+  <script src="js/darkmode.js" async defer></script>
+</body>
+
+</html>
