@@ -69,6 +69,8 @@ new Tone.Players({
 connect(new Tone.Panner(0.5).connect(reverb))];
 
 let midiDrums = [36, 38, 42, 46, 41, 43, 45, 49, 51];
+
+
 let reverseMidiMapping = new Map([
 [36, 0],
 [35, 0],
@@ -146,6 +148,13 @@ let outputs = {
 let rnn = new mm.MusicRNN(
 'https://storage.googleapis.com/download.magenta.tensorflow.org/tfjs_checkpoints/music_rnn/drum_kit_rnn');
 
+//{
+// "id": "drums_2bar_hikl_small",
+// "model": "MusicVAE",
+// "description": "A 2-bar, 9-class onehot drum model with a weak prior (higher KL divergence), which is better for reconstructions and interpolations. Less accurate, but smaller in size than full model.",
+// "url": "https://storage.googleapis.com/magentadata/js/checkpoints/music_vae/drums_2bar_hikl_small",
+// "size_mb": 18.5
+// },
 let vae = new mm.MusicVAE(
 'https://storage.googleapis.com/download.magenta.tensorflow.org/tfjs_checkpoints/music_vae/drums_2bar_hikl_small');
 
