@@ -396,7 +396,6 @@ then(([vars]) => {
     let stepsDown = density / 0.05;
     let stepsUp = (0.75 - density) / 0.05;
     let stepsBeyond = 0.25 / 0.05;
-
     let emptySeq = toNoteSequence([]);
     let fullSeq = toNoteSequence(
     _.times(state.pattern.length, () => _.range(9)));
